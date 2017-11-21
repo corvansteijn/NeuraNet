@@ -66,7 +66,21 @@ namespace NeuraNet
 
         private double Train(double[] input, Vector<double> targetOutput)
         {
-            return 0;
+            Vector<double> networkOutput = firstHiddenLayer.FeedForward(input);
+
+            return CalculateCost(targetOutput, networkOutput);
+        }
+
+        /// <summary>
+        /// The training algorithm has done a good job if it can find weights and biases for which the quadratic cost
+        /// is close to 0. It's not doing so well when the cost is large, because that would mean that
+        /// targetOutput - networkOutput is not close to the output for a large number of inputs.
+        /// </summary>
+        private double CalculateCost(Vector<double> targetOutput, Vector<double> networkOutput)
+        {
+            double Squared(double value) => (value * value);
+
+            return 0.5 * ((networkOutput - targetOutput).Map(Squared).Sum());
         }
     }
 }
