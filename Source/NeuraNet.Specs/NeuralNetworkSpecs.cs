@@ -78,6 +78,8 @@ namespace NeuraNet.Specs
         public void When_training_the_network_for_a_single_epoch_it_should_return_the_cost()
         {
             // Arrange
+            const double learningRate = 0.5;
+
             var network = new NeuralNetworkBuilder()
                 .Using(new TwoLayerNetworkProvider())
                 .Build();
@@ -86,7 +88,7 @@ namespace NeuraNet.Specs
             double cost = network.Train(new[]
             {
                 new TrainingExample(new[] { 1.0, -2.0, 3.0 }, new[] { 0.1234, 0.8766 })
-            }, 1);
+            }, 1, learningRate);
 
             // Assert
             cost.Should().BeApproximately(0.1418, 0.00005);
@@ -96,6 +98,8 @@ namespace NeuraNet.Specs
         public void When_training_the_network_for_a_single_epoch_it_should_calculate_the_gradient_vectors()
         {
             // Arrange
+            const double learningRate = 0.5;
+
             var network = new NeuralNetworkBuilder()
                 .Using(new TwoLayerNetworkProvider())
                 .Build();
@@ -104,7 +108,7 @@ namespace NeuraNet.Specs
             network.Train(new[]
             {
                 new TrainingExample(new[] { 1.0, -2.0, 3.0 }, new[] { 0.1234, 0.8766 })
-            }, 1);
+            }, 1, learningRate);
 
             // Assert
             Layer hiddenLayer = network.GetLayers().First();
@@ -151,6 +155,61 @@ namespace NeuraNet.Specs
             hiddenBiasGradients[3].Should().BeApproximately(0.000025860, 0.0000000005);
 
             hiddenLayer.PreviousLayerActivationGradients.Should().BeNull();
+        }
+
+        [Fact]
+        public void When_training_the_network_for_a_single_epoch_it_should_update_the_weights_and_biases_correctly()
+        {
+            // Arrange
+            const double learningRate = 0.5;
+
+            var network = new NeuralNetworkBuilder()
+                .Using(new TwoLayerNetworkProvider())
+                .Build();
+
+            // Act
+            network.Train(new[]
+            {
+                new TrainingExample(new[] { 1.0, -2.0, 3.0 }, new[] { 0.1234, 0.8766 })
+            }, 1, learningRate);
+
+            // Assert
+            Layer hiddenLayer = network.GetLayers().First();
+            Layer outputLayer = network.GetLayers().Last();
+
+            var updatedOutputWeights = outputLayer.Weights.ToColumnMajorArray();
+            updatedOutputWeights[0].Should().BeApproximately(-0.00791776, 0.000000005);
+            updatedOutputWeights[1].Should().BeApproximately(-0.00595456, 0.000000005);
+            updatedOutputWeights[2].Should().BeApproximately(-0.00399135, 0.000000005);
+            updatedOutputWeights[3].Should().BeApproximately(-0.00202815, 0.000000005);
+            updatedOutputWeights[4].Should().BeApproximately(0.04078488, 0.000000005);
+            updatedOutputWeights[5].Should().BeApproximately(0.04281853, 0.000000005);
+            updatedOutputWeights[6].Should().BeApproximately(0.04485217, 0.000000005);
+            updatedOutputWeights[7].Should().BeApproximately(0.04688582, 0.000000005);
+
+            var updatedOutputBiases = outputLayer.Biases.ToArray();
+            updatedOutputBiases[0].Should().BeApproximately(-0.02407493, 0.000000005);
+            updatedOutputBiases[1].Should().BeApproximately(0.07087427, 0.000000005);
+
+            var updatedHiddenWeights = hiddenLayer.Weights.ToColumnMajorArray();
+            updatedHiddenWeights[0].Should().BeApproximately(0.00099337, 0.000000005);
+            updatedHiddenWeights[1].Should().BeApproximately(0.00501327, 0.000000005);
+            updatedHiddenWeights[2].Should().BeApproximately(0.00898010, 0.000000005);
+            updatedHiddenWeights[3].Should().BeApproximately(0.00199127, 0.000000005);
+            updatedHiddenWeights[4].Should().BeApproximately(0.00601746, 0.000000005);
+            updatedHiddenWeights[5].Should().BeApproximately(0.00997380, 0.000000005);
+            updatedHiddenWeights[6].Should().BeApproximately(0.00298917, 0.000000005);
+            updatedHiddenWeights[7].Should().BeApproximately(0.00702166, 0.000000005);
+            updatedHiddenWeights[8].Should().BeApproximately(0.01096751, 0.000000005);
+            updatedHiddenWeights[9].Should().BeApproximately(0.00398707, 0.000000005);
+            updatedHiddenWeights[10].Should().BeApproximately(0.00802586, 0.000000005);
+            updatedHiddenWeights[11].Should().BeApproximately(0.01196121, 0.000000005);
+
+            var updatedHiddenBiases = hiddenLayer.Biases.ToArray();
+            updatedHiddenBiases[0].Should().BeApproximately(0.01299337, 0.000000005);
+            updatedHiddenBiases[1].Should().BeApproximately(0.01399127, 0.000000005);
+            updatedHiddenBiases[2].Should().BeApproximately(0.01498917, 0.000000005);
+            updatedHiddenBiases[3].Should().BeApproximately(0.01598707, 0.000000005);
         }
     }
 }

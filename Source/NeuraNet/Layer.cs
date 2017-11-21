@@ -16,8 +16,8 @@ namespace NeuraNet
 
         public IActivation OutputActivation { get; }
 
-        internal Matrix<double> Weights { get; }
-        internal Vector<double> Biases { get; }
+        internal Matrix<double> Weights { get; private set; }
+        internal Vector<double> Biases { get; private set; }
         private Vector<double> inputs;
         private Vector<double> outputs;
 
