@@ -2,18 +2,18 @@
 
 namespace NeuraNet.Activations
 {
-    public class SigmoidActivation : Activation
+    public class HyperbolicTangentActivation : Activation
     {
-        public override string Name => "Sigmoid";
+        public override string Name => "Tanh";
 
         protected override double Transform(double value)
         {
-            return (1 / (1 + Math.Exp(-value)));
+            return Math.Tanh(value);
         }
 
         protected override double Derivative(double value)
         {
-            return value * (1 - value);
+            return (1 - value) * (1 + value);
         }
     }
 }

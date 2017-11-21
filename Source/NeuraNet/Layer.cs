@@ -14,6 +14,9 @@ namespace NeuraNet
         private Layer previousLayer;
         private Layer nextLayer;
 
+        /// <summary>
+        /// The function that is used as activation function for calculating the output of this layer.
+        /// </summary>
         public IActivation OutputActivation { get; }
 
         internal Matrix<double> Weights { get; private set; }
@@ -28,15 +31,29 @@ namespace NeuraNet
         private Matrix<double> previousDeltaWeights;
         private Vector<double> previousDeltaBiases;
 
+        public int NeuronCount => Biases.Count;
         private bool IsFirstHiddenLayer => previousLayer == null;
+
+        public Layer(double[,] inputWeights, double[] biases, IActivation outputActivation)
+        {
+            Weights = Matrix<double>.Build.DenseOfArray(inputWeights);
+            Biases = Vector<double>.Build.DenseOfArray(biases);
+
+            OutputActivation = outputActivation;
+
+            WeightGradients = Matrix<double>.Build.Dense(Weights.RowCount, Weights.ColumnCount);
+
+            previousDeltaWeights = Matrix<double>.Build.Dense(Weights.RowCount, Weights.ColumnCount);
+            previousDeltaBiases = Vector<double>.Build.Dense(Biases.Count);
+        }
 
         public Layer(int numberOfNeuronsInPreviousLayer, int numberOfNeurons, ILayerInitializer layerInitializer,
             IActivation outputActivation)
         {
-            OutputActivation = outputActivation;
-
             Weights = Matrix<double>.Build.Dense(numberOfNeuronsInPreviousLayer, numberOfNeurons, layerInitializer.GetWeight);
             Biases = Vector<double>.Build.Dense(numberOfNeurons, layerInitializer.GetBias);
+
+            OutputActivation = outputActivation;
 
             previousDeltaWeights = Matrix<double>.Build.Dense(Weights.RowCount, Weights.ColumnCount);
             previousDeltaBiases = Vector<double>.Build.Dense(Biases.Count);

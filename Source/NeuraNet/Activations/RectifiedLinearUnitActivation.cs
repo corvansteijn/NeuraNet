@@ -2,18 +2,18 @@
 
 namespace NeuraNet.Activations
 {
-    public class SigmoidActivation : Activation
+    public class RectifiedLinearUnitActivation : Activation
     {
-        public override string Name => "Sigmoid";
+        public override string Name => "ReLU";
 
         protected override double Transform(double value)
         {
-            return (1 / (1 + Math.Exp(-value)));
+            return Math.Max(0, value);
         }
 
         protected override double Derivative(double value)
         {
-            return value * (1 - value);
+            return value < 0 ? 0 : 1;
         }
     }
 }

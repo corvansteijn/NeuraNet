@@ -22,7 +22,7 @@ namespace NeuraNet.FormsApp
         private NeuralNetwork network;
 
         private Bitmap drawnDigit;
-        private bool isWriting = false;
+        private bool isWriting;
         private Point previousPoint;
 
         public NeuralNetworkDemoForm()
@@ -43,10 +43,7 @@ namespace NeuraNet.FormsApp
 
         private void NeuralNetworkDemoForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (drawnDigit != null)
-            {
-                drawnDigit.Dispose();
-            }
+            drawnDigit?.Dispose();
         }
 
         private void ResetNetworkLayerControls()
@@ -289,7 +286,23 @@ namespace NeuraNet.FormsApp
             int neuronCount = decimal.ToInt32(neuronCountSelector.Value);
             string selectedItem = (string)activationDropdown.SelectedItem;
 
-            IActivation activation = new SigmoidActivation();
+            IActivation activation;
+            if (selectedItem == "Tanh")
+            {
+                activation = new HyperbolicTangentActivation();
+            }
+            else if (selectedItem == "ReLU")
+            {
+                activation = new RectifiedLinearUnitActivation();
+            }
+            else if (selectedItem == "Softplus")
+            {
+                activation = new SoftplusActivation();
+            }
+            else
+            {
+                activation = new SigmoidActivation();
+            }
 
             return new LayerConfiguration(neuronCount, activation);
         }
@@ -323,7 +336,7 @@ namespace NeuraNet.FormsApp
 
         private void UpdateTrainingProgress(object sender, ExampleTrainedEventArgs args)
         {
-            if (args.CurrentExample % 10 != 0)
+            if (args.CurrentExample % 50 != 0)
             {
                 return;
             }
@@ -518,9 +531,9 @@ namespace NeuraNet.FormsApp
                 }
 
                 using (Graphics g = Graphics.FromImage(drawnDigit))
-                using (Pen pen = new Pen(Color.Black, 2))
+                using (Pen pen = new Pen(Color.FromArgb(5, 5, 5), 2))
                 {
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                     g.DrawLine(pen, previousPoint, e.Location);
                     previousPoint = e.Location;
                     writingPanel.Invalidate();
@@ -532,7 +545,7 @@ namespace NeuraNet.FormsApp
         {
             drawnDigit = new Bitmap(writingPanel.Width, writingPanel.Height);
 
-            using (Graphics g = Graphics.FromImage(drawnDigit))
+            using (Graphics.FromImage(drawnDigit))
             {
                 writingPanel.Invalidate();
             }

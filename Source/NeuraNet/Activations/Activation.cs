@@ -4,6 +4,8 @@ namespace NeuraNet.Activations
 {
     public abstract class Activation : IActivation
     {
+        public abstract string Name { get; }
+
         public Vector<double> Transform(Vector<double> values)
         {
             return values.Map(Transform, Zeros.Include);
