@@ -72,5 +72,23 @@ namespace NeuraNet.Specs
             networkOutput[0].Should().BeApproximately(0.5164, 0.00005);
             networkOutput[1].Should().BeApproximately(0.5172, 0.00005);
         }
+
+        [Fact]
+        public void When_training_the_network_for_a_single_epoch_it_should_return_the_cost()
+        {
+            // Arrange
+            var network = new NeuralNetworkBuilder()
+                .Using(new TwoLayerNetworkProvider())
+                .Build();
+
+            // Act
+            double cost = network.Train(new[]
+            {
+                new TrainingExample(new[] { 1.0, -2.0, 3.0 }, new[] { 0.1234, 0.8766 })
+            }, 1);
+
+            // Assert
+            cost.Should().BeApproximately(0.1418, 0.00005);
+        }
     }
 }
