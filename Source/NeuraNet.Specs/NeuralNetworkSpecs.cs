@@ -214,5 +214,34 @@ namespace NeuraNet.Specs
             updatedHiddenBiases[2].Should().BeApproximately(0.01498917, 0.000000005);
             updatedHiddenBiases[3].Should().BeApproximately(0.01598707, 0.000000005);
         }
+
+        [Fact]
+        public void When_querying_the_network_after_training_it_should_yield_the_correct_output()
+        {
+            // Arrange
+            var network = new NeuralNetworkBuilder()
+                .Using(new XORNetworkLayout())
+                .Build();
+
+            network.Train(new[]
+            {
+                new TrainingExample(new[] { 0.0, 0.0 }, new[] { 0.0 }),
+                new TrainingExample(new[] { 0.0, 1.0 }, new[] { 1.0 }),
+                new TrainingExample(new[] { 1.0, 0.0 }, new[] { 1.0 }),
+                new TrainingExample(new[] { 1.0, 1.0 }, new[] { 0.0 })
+            }, 10000, 0.3, 0.1);
+
+            // Act
+            double output_0_0 = network.Query(new[] { 0.0, 0.0 }).Single();
+            double output_0_1 = network.Query(new[] { 0.0, 1.0 }).Single();
+            double output_1_0 = network.Query(new[] { 1.0, 0.0 }).Single();
+            double output_1_1 = network.Query(new[] { 1.0, 1.0 }).Single();
+
+            // Assert
+            output_0_0.Should().BeApproximately(0.0, 0.05);
+            output_0_1.Should().BeApproximately(1.0, 0.05);
+            output_1_0.Should().BeApproximately(1.0, 0.05);
+            output_1_1.Should().BeApproximately(0.0, 0.05);
+        }
     }
 }
