@@ -52,8 +52,12 @@ namespace NeuraNet
         /// all the training examples
         /// </param>
         /// <param name="learningRate">Influences how big the changes to weights and bias values are.</param>
+        /// <param name="momentum">
+        /// The use of a momentum in the backpropagation algorithm can be helpful in speeding the convergence and
+        /// avoiding local minima.
+        /// </param>
         /// <returns>The mean cost for the examples in the last epoch</returns>
-        public double Train(TrainingExample[] trainingExamples, int numberOfEpochs, double learningRate)
+        public double Train(TrainingExample[] trainingExamples, int numberOfEpochs, double learningRate, double momentum)
         {
             double meanCost = 0;
 
@@ -64,7 +68,7 @@ namespace NeuraNet
                 int currentExample = 1;
                 foreach (TrainingExample example in trainingExamples)
                 {
-                    costSumForAllExamples += Train(example.Input, example.ExpectedOutput, learningRate);
+                    costSumForAllExamples += Train(example.Input, example.ExpectedOutput, learningRate, momentum);
 
                     meanCost = costSumForAllExamples / currentExample;
 
@@ -75,14 +79,14 @@ namespace NeuraNet
             return meanCost;
         }
 
-        private double Train(double[] input, Vector<double> targetOutput, double learningRate)
+        private double Train(double[] input, Vector<double> targetOutput, double learningRate, double momentum)
         {
             Vector<double> networkOutput = firstHiddenLayer.FeedForward(input);
 
             Vector<double> costDerivative = networkOutput - targetOutput;
             outputLayer.BackPropagate(costDerivative);
 
-            firstHiddenLayer.PerformGradientDescent(learningRate);
+            firstHiddenLayer.PerformGradientDescent(learningRate, momentum);
 
             return CalculateCost(targetOutput, networkOutput);
         }
