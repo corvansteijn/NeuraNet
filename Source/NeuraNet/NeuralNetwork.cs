@@ -82,6 +82,8 @@ namespace NeuraNet
             Vector<double> costDerivative = networkOutput - targetOutput;
             outputLayer.BackPropagate(costDerivative);
 
+            firstHiddenLayer.PerformGradientDescent(learningRate);
+
             return CalculateCost(targetOutput, networkOutput);
         }
 
