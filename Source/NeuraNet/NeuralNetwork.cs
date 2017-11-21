@@ -14,6 +14,7 @@ namespace NeuraNet
     {
         private readonly IEnumerable<Layer> layers;
         private readonly Layer firstHiddenLayer;
+        private readonly Layer outputLayer;
 
         /// <summary>
         /// Instantiates a new neural network with the layout provided by the specified <paramref name="layoutProvider"/>.
@@ -23,6 +24,15 @@ namespace NeuraNet
         {
             layers = layoutProvider.GetLayers();
             firstHiddenLayer = layers.First();
+            outputLayer = layers.Last();
+        }
+
+        /// <summary>
+        /// Returns the layers of the network
+        /// </summary>
+        public IEnumerable<Layer> GetLayers()
+        {
+            return layers;
         }
 
         /// <summary>

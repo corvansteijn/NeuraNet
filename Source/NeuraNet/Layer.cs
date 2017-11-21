@@ -18,6 +18,11 @@ namespace NeuraNet
 
         internal Matrix<double> Weights { get; }
         internal Vector<double> Biases { get; }
+        private Vector<double> inputs;
+        private Vector<double> z;
+
+        internal Matrix<double> WeightGradients { get; private set; }
+        internal Vector<double> BiasGradients { get; private set; }
 
         public Layer(int numberOfNeuronsInPreviousLayer, int numberOfNeurons, ILayerInitializer layerInitializer,
             IActivation outputActivation)
@@ -51,7 +56,9 @@ namespace NeuraNet
 
         private Vector<double> FeedForward(Vector<double> inputs)
         {
-            Vector<double> z = (inputs * Weights) + Biases;
+            this.inputs = inputs;
+
+            z = (inputs * Weights) + Biases;
             Vector<double> outputs = OutputActivation.Transform(z);
 
             return (nextLayer != null) ? nextLayer.FeedForward(outputs) : outputs;
