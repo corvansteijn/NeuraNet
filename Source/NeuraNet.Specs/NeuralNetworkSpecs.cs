@@ -107,6 +107,7 @@ namespace NeuraNet.Specs
             }, 1);
 
             // Assert
+            Layer hiddenLayer = network.GetLayers().First();
             Layer outputLayer = network.GetLayers().Last();
 
             double[] outputWeightGradients = outputLayer.WeightGradients.ToColumnMajorArray();
@@ -122,6 +123,34 @@ namespace NeuraNet.Specs
             var outputBiasGradients = outputLayer.BiasGradients.ToArray();
             outputBiasGradients[0].Should().BeApproximately(0.098150, 0.0000005);
             outputBiasGradients[1].Should().BeApproximately(-0.089749, 0.0000005);
+
+            var outputInputGradients = outputLayer.PreviousLayerActivationGradients.ToArray();
+            outputInputGradients[0].Should().BeApproximately(0.00005307, 0.000000005);
+            outputInputGradients[1].Should().BeApproximately(0.00006988, 0.000000005);
+            outputInputGradients[2].Should().BeApproximately(0.00008668, 0.000000005);
+            outputInputGradients[3].Should().BeApproximately(0.00010348, 0.000000005);
+
+            double[] hiddenWeightGradients = hiddenLayer.WeightGradients.ToColumnMajorArray();
+            hiddenWeightGradients[0].Should().BeApproximately(0.00001326, 0.0000005);
+            hiddenWeightGradients[1].Should().BeApproximately(-0.00002653, 0.0000005);
+            hiddenWeightGradients[2].Should().BeApproximately(0.00003980, 0.0000005);
+            hiddenWeightGradients[3].Should().BeApproximately(0.00001746, 0.0000005);
+            hiddenWeightGradients[4].Should().BeApproximately(-0.00003493, 0.0000005);
+            hiddenWeightGradients[5].Should().BeApproximately(0.00005239, 0.0000005);
+            hiddenWeightGradients[6].Should().BeApproximately(0.00002166, 0.0000005);
+            hiddenWeightGradients[7].Should().BeApproximately(-0.00004332, 0.0000005);
+            hiddenWeightGradients[8].Should().BeApproximately(0.00006499, 0.0000005);
+            hiddenWeightGradients[9].Should().BeApproximately(0.00002586, 0.0000005);
+            hiddenWeightGradients[10].Should().BeApproximately(-0.00005172, 0.0000005);
+            hiddenWeightGradients[11].Should().BeApproximately(0.00007758, 0.0000005);
+
+            double[] hiddenBiasGradients = hiddenLayer.BiasGradients.ToArray();
+            hiddenBiasGradients[0].Should().BeApproximately(0.000013265, 0.0000000005);
+            hiddenBiasGradients[1].Should().BeApproximately(0.000017464, 0.0000000005);
+            hiddenBiasGradients[2].Should().BeApproximately(0.000021662, 0.0000000005);
+            hiddenBiasGradients[3].Should().BeApproximately(0.000025860, 0.0000000005);
+
+            hiddenLayer.PreviousLayerActivationGradients.Should().BeNull();
         }
     }
 }
