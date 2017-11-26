@@ -76,6 +76,8 @@ namespace NeuraNet
         public void BackPropagate(Vector<double> costDerivative)
         {
             CalculateGradients(costDerivative);
+
+            previousLayer?.BackPropagate(PreviousLayerActivationGradients);
         }
 
         /// <summary>
@@ -94,6 +96,11 @@ namespace NeuraNet
 
             WeightGradients = CalculateWeightGradients(nodeDeltas);
             BiasGradients = CalculateBiasGradients(nodeDeltas);
+
+            if (!IsFirstHiddenLayer)
+            {
+                PreviousLayerActivationGradients = CalculatePreviousLayerActivationGradients(nodeDeltas);
+            }
         }
 
         private Matrix<double> CalculateWeightGradients(Vector<double> nodeDeltas)
@@ -106,6 +113,12 @@ namespace NeuraNet
         {
             const int delZ_delB = 1;
             return delZ_delB * nodeDeltas;
+        }
+
+        private Vector<double> CalculatePreviousLayerActivationGradients(Vector<double> nodeDeltas)
+        {
+            Matrix<double> delZ_delA_previous = Weights;
+            return delZ_delA_previous * nodeDeltas;
         }
     }
 }
