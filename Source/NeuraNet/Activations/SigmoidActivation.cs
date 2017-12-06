@@ -11,7 +11,8 @@ namespace NeuraNet.Activations
 
         protected override double Derivative(double value)
         {
-            return 0;
+            double sigmoid = Transform(value);
+            return sigmoid * (1 - sigmoid);
         }
     }
 }

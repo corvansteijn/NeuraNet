@@ -63,5 +63,46 @@ namespace NeuraNet
 
             return (nextLayer != null) ? nextLayer.FeedForward(outputs) : outputs;
         }
+
+        /// <summary>
+        /// Propagates the network output error backwards through the network by calculating the gradients for the current layer.
+        /// If the current layer has a <see cref="previousLayer"/> the <see cref="PreviousLayerActivationGradients"/> will be
+        /// propagated backwards to that layer, so that eventually the gradients will be calculated for all layers in the network.
+        /// </summary>
+        /// <param name="costDerivative">Derivative of the cost with respect to the output activation of the current layer</param>
+        public void BackPropagate(Vector<double> costDerivative)
+        {
+            CalculateGradients(costDerivative);
+        }
+
+        /// <summary>
+        /// Calculates the gradient for the current layer based on the gradients and input weights of the next layer
+        /// in the neural network.
+        /// </summary>
+        /// <param name="delC_delA">Derivative of cost w.r.t. the hidden layer output</param>
+        /// <remarks>
+        /// Gradients are a measure of how far off, and in what direction (positive or negative) the current layer's 
+        /// output values are.
+        /// </remarks>
+        private void CalculateGradients(Vector<double> delC_delA)
+        {
+            Vector<double> delA_delZ = OutputActivation.Derivative(z);
+            Vector<double> nodeDeltas = delA_delZ.PointwiseMultiply(delC_delA);
+
+            WeightGradients = CalculateWeightGradients(nodeDeltas);
+            BiasGradients = CalculateBiasGradients(nodeDeltas);
+        }
+
+        private Matrix<double> CalculateWeightGradients(Vector<double> nodeDeltas)
+        {
+            Vector<double> delZ_delW = inputs;
+            return delZ_delW.OuterProduct(nodeDeltas);
+        }
+
+        private Vector<double> CalculateBiasGradients(Vector<double> nodeDeltas)
+        {
+            const int delZ_delB = 1;
+            return delZ_delB * nodeDeltas;
+        }
     }
 }
