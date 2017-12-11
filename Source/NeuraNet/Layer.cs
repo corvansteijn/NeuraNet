@@ -19,7 +19,7 @@ namespace NeuraNet
         internal Matrix<double> Weights { get; }
         internal Vector<double> Biases { get; }
         private Vector<double> inputs;
-        private Vector<double> z;
+        private Vector<double> outputs;
 
         internal Matrix<double> WeightGradients { get; private set; }
         internal Vector<double> BiasGradients { get; private set; }
@@ -58,8 +58,8 @@ namespace NeuraNet
         {
             this.inputs = inputs;
 
-            z = (inputs * Weights) + Biases;
-            Vector<double> outputs = OutputActivation.Transform(z);
+            Vector<double> z = (inputs * Weights) + Biases;
+            outputs = OutputActivation.Transform(z);
 
             return (nextLayer != null) ? nextLayer.FeedForward(outputs) : outputs;
         }
@@ -86,7 +86,7 @@ namespace NeuraNet
         /// </remarks>
         private void CalculateGradients(Vector<double> delC_delA)
         {
-            Vector<double> delA_delZ = OutputActivation.Derivative(z);
+            Vector<double> delA_delZ = OutputActivation.Derivative(outputs);
             Vector<double> nodeDeltas = delA_delZ.PointwiseMultiply(delC_delA);
 
             WeightGradients = CalculateWeightGradients(nodeDeltas);
